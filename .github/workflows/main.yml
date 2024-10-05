@@ -1,0 +1,32 @@
+name: vprofile-app
+on: workflow_dispatch
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-east-1
+  EKS_CLUSTER_NAME: vprofile-eks
+  ECR_REPOSITORY: vproapp
+  
+jobs:
+  Testing:
+    name: testing the code
+    runs-on: ubuntu_latest
+
+    steps:
+      - name: checkout the code
+        uses: actions/checkout@v4
+
+      - name: building the artifact
+        run: mvn install
+
+      - name: running the tests
+        run: mvn test
+
+      - name: checkstyle analysis
+        run: mvn checkstyle:checkstyle
+
+      - name: installing java11
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '11'
